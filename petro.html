@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Highway Racer - Kunal Singh Shekhawat</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background: #05070c;
+    font-family: Arial, sans-serif;
+    color: white;
+    user-select: none;
+}
+
+/* GAME */
+#game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(#101b31, #05070b);
+}
+
+/* SKY */
+.sky {
+    position: absolute;
+    width: 100%;
+    height: 45%;
+    background:
+        radial-gradient(circle at 50% 30%, #536d91, #182942 45%, #080d18);
+}
+
+/* STARS */
+.star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+}
+
+/* ROAD */
+.road {
+    position: absolute;
+    width: min(70vw, 650px);
+    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background:
+        linear-gradient(
+            90deg,
+            #111 0%,
+            #242424 5%,
+            #303030 50%,
+            #242424 95%,
+            #111 100%
+        );
+    overflow: hidden;
+}
+
+/* ROAD BORDERS */
+.road::before,
+.road::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 8px;
+    background: repeating-linear-gradient(
+        to bottom,
+        #ff2222 0px,
+        #ff2222 45px,
+        white 45px,
+        white 90px
+    );
+    z-index: 2;
+}
+
+.road::before {
+    left: 0;
+}
+
+.road::after {
+    right: 0;
+}
+
+/* LANE MARKINGS */
+.lane {
+    position: absolute;
+    top: -150px;
+    width: 8px;
+    height: 100px;
+    background: white;
+    animation: roadMove 0.5s linear infinite;
+}
+
+.lane1 {
+    left: 33.33%;
+}
+
+.lane2 {
+    left: 66.66%;
+}
+
+@keyframes roadMove {
+    from {
+        transform: translateY(-150px);
+    }
+    to {
+        transform: translateY(120vh);
+    }
+}
+
+/* PLAYER CAR */
+#player {
+    position: absolute;
+    width: 64px;
+    height: 108px;
+    bottom: 55px;
+    z-index: 20;
+}
+
+.car-body {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px 18px 10px 10px;
+    background: linear-gradient(
+        90deg,
+        #720000,
+        #ff2020 30%,
+        #ff6767 50%,
+        #d00000 70%,
+        #650000
+    );
+    box-shadow:
+        0 0 20px red,
+        inset 0 0 10px #ffb0b0;
+}
+
+.windshield {
+    position: absolute;
+    width: 44px;
+    height: 30px;
+    left: 10px;
+    top: 15px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #9beaff, #14263c);
+    border: 2px solid #111;
+}
+
+.backGlass {
+    position: absolute;
+    width: 44px;
+    height: 25px;
+    left: 10px;
+    bottom: 15px;
+    border-radius: 6px;
+    background: #142637;
+    border: 2px solid #111;
+}
+
+.light {
+    position: absolute;
+    width: 14px;
+    height: 8px;
+    background: #fff;
+    box-shadow: 0 0 12px white;
+    border-radius: 5px;
+    top: 5px;
+}
+
+.light.left {
+    left: 8px;
+}
+
+.light.right {
+    right: 8px;
+}
+
+.tail {
+    position: absolute;
+    width: 15px;
+    height: 7px;
+    bottom: 5px;
+    background: red;
+    box-shadow: 0 0 12px red;
+    border-radius: 4px;
+}
+
+.tail.left {
+    left: 8px;
+}
+
+.tail.right {
+    right: 8px;
+}
+
+/* ENEMY CAR */
+.enemy {
+    position: absolute;
+    width: 60px;
+    height: 100px;
+    top: -120px;
+    z-index: 10;
+}
+
+.enemyBody {
+    position: absolute;
+    inset: 0;
+    border-radius: 17px 17px 9px 9px;
+    background: linear-gradient(
+        90deg,
+        #111,
+        #777,
+        #222
+    );
+    box-shadow: 0 0 12px #111;
+}
+
+.enemyGlass {
+    position: absolute;
+    width: 40px;
+    height: 28px;
+    top: 14px;
+    left: 10px;
+    border-radius: 7px;
+    background: #162c43;
+}
+
+.enemyLight {
+    position: absolute;
+    width: 12px;
+    height: 7px;
+    bottom: 6px;
+    background: red;
+    box-shadow: 0 0 8px red;
+}
+
+.enemyLight.left {
+    left: 8px;
+}
+
+.enemyLight.right {
+    right: 8px;
+}
+
+/* HUD */
+#hud {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(92%, 650px);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    z-index: 50;
+}
+
+.info {
+    padding: 10px 14px;
+    background: rgba(0,0,0,.72);
+    border: 1px solid #666;
+    border-radius: 12px;
+    font-size: 16px;
+}
+
+/* SCREENS */
+.screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,.80);
+    z-index: 100;
+}
+
+.panel {
+    width: min(90%, 520px);
+    padding: 35px;
+    text-align: center;
+    border-radius: 25px;
+    background: linear-gradient(145deg,#111827,#070a10);
+    border: 2px solid #ff2525;
+    box-shadow: 0 0 40px rgba(255,0,0,.35);
+}
+
+.panel h1 {
+    color: #ff3030;
+    font-size: 44px;
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px red;
+}
+
+.panel h2 {
+    color: #ffd000;
+    font-size: 38px;
+    margin-bottom: 15px;
+}
+
+.panel p {
+    margin: 10px;
+    color: #ddd;
+}
+
+button {
+    margin-top: 18px;
+    padding: 14px 34px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(90deg,#ff1717,#ff6500);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255,40,0,.5);
+}
+
+button:hover {
+    transform: scale(1.06);
+}
+
+/* LEVEL SCREEN */
+#levelScreen {
+    display: none;
+}
+
+/* GAME OVER */
+#gameOver {
+    display: none;
+}
+
+/* WIN */
+#winScreen {
+    display: none;
+}
+
+/* MOBILE BUTTONS */
+.controls {
+    display: none;
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    justify-content: center;
+    gap: 30px;
+    z-index: 60;
+}
+
+.controlButton {
+    width: 80px;
+    height: 58px;
+    margin: 0;
+    padding: 0;
+    font-size: 28px;
+    background: rgba(255,255,255,.15);
+    border: 1px solid white;
+}
+
+@media(max-width:700px) {
+    .road {
+        width: 85vw;
+    }
+
+    .controls {
+        display: flex;
+    }
+
+    .panel h1 {
+        font-size: 34px;
+    }
+
+    .info {
+        font-size: 13px;
+        padding: 8px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <div class="sky"></div>
+
+    <!-- ROAD -->
+    <div class="road">
+        <div class="lane lane1"></div>
+        <div class="lane lane2"></div>
+    </div>
+
+    <!-- PLAYER -->
+    <div id="player">
+        <div class="car-body"></div>
+        <div class="windshield"></div>
+        <div class="backGlass"></div>
+
+        <div class="light left"></div>
+        <div class="light right"></div>
+
+        <div class="tail left"></div>
+        <div class="tail right"></div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud">
+        <div class="info">🏆 <span id="score">0</span></div>
+        <div class="info">🎯 Level <span id="level">1</span></div>
+        <div class="info">❤️ <span id="lives">3</span></div>
+        <div class="info">⚡ <span id="speed">1</span>x</div>
+    </div>
+
+    <!-- START -->
+    <div id="startScreen" class="screen">
+        <div class="panel">
+            <h1>🏎️ HIGHWAY RACER</h1>
+
+            <p>🔥 Race through 5 challenging levels!</p>
+            <p>⬅️ ➡️ Use Arrow Keys or A / D</p>
+            <p>📱 Mobile controls available</p>
+            <p>🎯 Every 100 points = new level</p>
+
+            <button onclick="startGame()">START RACE</button>
+        </div>
+    </div>
+
+    <!-- LEVEL UP -->
+    <div id="levelScreen" class="screen">
+        <div class="panel">
+            <h2 id="levelTitle">LEVEL 2</h2>
+            <p id="levelMessage">Get ready for a faster race!</p>
+
+            <button onclick="continueGame()">CONTINUE</button>
+        </div>
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="gameOver" class="screen">
+        <div class="panel">
+            <h2>💥 GAME OVER!</h2>
+
+            <p>Final Score: <strong id="finalScore">0</strong></p>
+            <p>Level Reached: <strong id="finalLevel">1</strong></p>
+
+            <button onclick="startGame()">RACE AGAIN</button>
+        </div>
+    </div>
+
+    <!-- WIN -->
+    <div id="winScreen" class="screen">
+        <div class="panel">
+            <h1>🏆 YOU WIN!</h1>
+
+            <p>Congratulations!</p>
+            <p>You completed all 5 levels!</p>
+
+            <p>Final Score:</p>
+            <h2 id="winScore">0</h2>
+
+            <button onclick="startGame()">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <!-- MOBILE -->
+    <div class="controls">
+        <button class="controlButton" onclick="moveLeft()">⬅️</button>
+        <button class="controlButton" onclick="moveRight()">➡️</button>
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   GAME VARIABLES
+========================= */
+
+const game = document.getElementById("game");
+const road = document.querySelector(".road");
+const player = document.getElementById("player");
+
+const scoreText = document.getElementById("score");
+const levelText = document.getElementById("level");
+const livesText = document.getElementById("lives");
+const speedText = document.getElementById("speed");
+
+const startScreen = document.getElementById("startScreen");
+const levelScreen = document.getElementById("levelScreen");
+const gameOver = document.getElementById("gameOver");
+const winScreen = document.getElementById("winScreen");
+
+const levelTitle = document.getElementById("levelTitle");
+const levelMessage = document.getElementById("levelMessage");
+
+const finalScore = document.getElementById("finalScore");
+const finalLevel = document.getElementById("finalLevel");
+const winScore = document.getElementById("winScore");
+
+let score = 0;
+let level = 1;
+let lives = 3;
+
+let playerX = 0;
+
+let gameRunning = false;
+let paused = false;
+
+let enemies = [];
+let spawnTimer = 0;
+
+let animationFrame;
+
+/* LEVEL SETTINGS */
+
+const levels = {
+
+    1: {
+        speed: 5,
+        spawn: 75,
+        message: "Easy start! Learn the road."
+    },
+
+    2: {
+        speed: 6.5,
+        spawn: 62,
+        message: "Traffic is getting faster!"
+    },
+
+    3: {
+        speed: 8,
+        spawn: 50,
+        message: "Watch out! Heavy traffic!"
+    },
+
+    4: {
+        speed: 10,
+        spawn: 40,
+        message: "EXTREME SPEED!"
+    },
+
+    5: {
+        speed: 12,
+        spawn: 30,
+        message: "FINAL LEVEL! SURVIVE!"
+    }
+
+};
+
+/* =========================
+   START GAME
+========================= */
+
+function startGame() {
+
+    startScreen.style.display = "none";
+    gameOver.style.display = "none";
+    winScreen.style.display = "none";
+    levelScreen.style.display = "none";
+
+    score = 0;
+    level = 1;
+    lives = 3;
+
+    spawnTimer = 0;
+
+    gameRunning = true;
+    paused = false;
+
+    enemies.forEach(e => e.element.remove());
+    enemies = [];
+
+    updateHUD();
+
+    positionPlayer();
+
+    cancelAnimationFrame(animationFrame);
+
+    gameLoop();
+}
+
+/* =========================
+   PLAYER POSITION
+========================= */
+
+function positionPlayer() {
+
+    playerX = road.clientWidth / 2 - player.offsetWidth / 2;
+
+    player.style.left = playerX + "px";
+}
+
+/* =========================
+   PLAYER MOVEMENT
+========================= */
+
+function moveLeft() {
+
+    if (!gameRunning || paused)
+        return;
+
+    playerX -= road.clientWidth / 3;
+
+    if (playerX < 10)
+        playerX = 10;
+
+    player.style.left = playerX + "px";
+}
+
+function moveRight() {
+
+    if (!gameRunning || paused)
+        return;
+
+    playerX += road.clientWidth / 3;
+
+    const maxX = road.clientWidth - player.offsetWidth - 10;
+
+    if (playerX > maxX)
+        playerX = maxX;
+
+    player.style.left = playerX + "px";
+}
+
+/* KEYBOARD */
+
+document.addEventListener("keydown", function(e) {
+
+    if (
+        e.key === "ArrowLeft" ||
+        e.key.toLowerCase() === "a"
+    ) {
+        moveLeft();
+    }
+
+    if (
+        e.key === "ArrowRight" ||
+        e.key.toLowerCase() === "d"
+    ) {
+        moveRight();
+    }
+
+    if (e.code === "Space" && !gameRunning) {
+        startGame();
+    }
+});
+
+/* =========================
+   CREATE ENEMY
+========================= */
+
+function createEnemy() {
+
+    const enemy = document.createElement("div");
+
+    enemy.className = "enemy";
+
+    enemy.innerHTML = `
+        <div class="enemyBody"></div>
+        <div class="enemyGlass"></div>
+        <div class="enemyLight left"></div>
+        <div class="enemyLight right"></div>
+    `;
+
+    const laneNumber =
+        Math.floor(Math.random() * 3);
+
+    const lanePositions = [
+        0.166,
+        0.5,
+        0.833
+    ];
+
+    const x =
+        road.clientWidth * lanePositions[laneNumber]
+        - 30;
+
+    enemy.style.left = x + "px";
+    enemy.style.top = "-120px";
+
+    road.appendChild(enemy);
+
+    enemies.push({
+        element: enemy,
+        x: x,
+        y: -120
+    });
+}
+
+/* =========================
+   COLLISION
+========================= */
+
+function collision(a, b) {
+
+    const r1 = a.getBoundingClientRect();
+    const r2 = b.getBoundingClientRect();
+
+    return !(
+        r1.bottom < r2.top + 15 ||
+        r1.top > r2.bottom - 15 ||
+        r1.right < r2.left + 10 ||
+        r1.left > r2.right - 10
+    );
+}
+
+/* =========================
+   LEVEL SYSTEM
+========================= */
+
+function checkLevel() {
+
+    const newLevel =
+        Math.floor(score / 100) + 1;
+
+    if (newLevel > 5) {
+
+        winGame();
+        return;
+    }
+
+    if (newLevel > level) {
+
+        level = newLevel;
+
+        paused = true;
+
+        levelTitle.textContent =
+            "🏁 LEVEL " + level;
+
+        levelMessage.textContent =
+            levels[level].message;
+
+        levelScreen.style.display = "flex";
+
+        updateHUD();
+    }
+}
+
+/* CONTINUE AFTER LEVEL */
+
+function continueGame() {
+
+    levelScreen.style.display = "none";
+
+    paused = false;
+
+    spawnTimer = 0;
+}
+
+/* =========================
+   UPDATE HUD
+========================= */
+
+function updateHUD() {
+
+    scoreText.textContent = score;
+    levelText.textContent = level;
+    livesText.textContent = lives;
+
+    if (levels[level]) {
+
+        speedText.textContent =
+            (levels[level].speed / 5).toFixed(1);
+    }
+}
+
+/* =========================
+   GAME LOOP
+========================= */
+
+function gameLoop() {
+
+    if (!gameRunning) {
+        return;
+    }
+
+    if (paused) {
+
+        animationFrame =
+            requestAnimationFrame(gameLoop);
+
+        return;
+    }
+
+    const settings = levels[level];
+
+    spawnTimer++;
+
+    /* Spawn traffic */
+
+    if (spawnTimer >= settings.spawn) {
+
+        createEnemy();
+
+        spawnTimer = 0;
+
+        /* Higher levels can create extra traffic */
+
+        if (level >= 3 && Math.random() < 0.25) {
+            setTimeout(createEnemy, 250);
+        }
+    }
+
+    /* Move enemies */
+
+    enemies.forEach((enemy, index) => {
+
+        enemy.y += settings.speed;
+
+        enemy.element.style.top =
+            enemy.y + "px";
+
+        /* Collision */
+
+        if (
+            collision(
+                player,
+                enemy.element
+            )
+        ) {
+
+            enemy.element.remove();
+
+            enemies.splice(index, 1);
+
+            loseLife();
+
+            return;
+        }
+
+        /* Passed player */
+
+        if (
+            enemy.y >
+            window.innerHeight + 100
+        ) {
+
+            enemy.element.remove();
+
+            enemies.splice(index, 1);
+
+            score += 10;
+
+            checkLevel();
+
+            updateHUD();
+        }
+
+    });
+
+    animationFrame =
+        requestAnimationFrame(gameLoop);
+}
+
+/* =========================
+   LOSE LIFE
+========================= */
+
+function loseLife() {
+
+    lives--;
+
+    updateHUD();
+
+    /* Flash player */
+
+    player.style.filter =
+        "brightness(3)";
+
+    setTimeout(() => {
+
+        player.style.filter =
+            "brightness(1)";
+
+    }, 250);
+
+    if (lives <= 0) {
+
+        endGame();
+    }
+}
+
+/* =========================
+   GAME OVER
+========================= */
+
+function endGame() {
+
+    gameRunning = false;
+
+    cancelAnimationFrame(animationFrame);
+
+    finalScore.textContent = score;
+    finalLevel.textContent = level;
+
+    gameOver.style.display = "flex";
+}
+
+/* =========================
+   WIN GAME
+========================= */
+
+function winGame() {
+
+    gameRunning = false;
+
+    cancelAnimationFrame(animationFrame);
+
+    winScore.textContent = score;
+
+    winScreen.style.display = "flex";
+}
+
+/* =========================
+   RESIZE
+========================= */
+
+window.addEventListener(
+    "resize",
+    function() {
+
+        if (gameRunning) {
+
+            const maxX =
+                road.clientWidth -
+                player.offsetWidth -
+                10;
+
+            if (playerX > maxX) {
+                playerX = maxX;
+            }
+
+            player.style.left =
+                playerX + "px";
+        }
+
+    }
+);
+
+/* =========================
+   DECORATIVE STARS
+========================= */
+
+for (let i = 0; i < 80; i++) {
+
+    const star =
+        document.createElement("div");
+
+    star.className = "star";
+
+    star.style.left =
+        Math.random() * 100 + "%";
+
+    star.style.top =
+        Math.random() * 40 + "%";
+
+    star.style.opacity =
+        Math.random();
+
+    game.appendChild(star);
+}
+
+</script>
+
+</body>
+</html>
